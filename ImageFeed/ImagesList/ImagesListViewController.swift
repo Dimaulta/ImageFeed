@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Ульта on 24.04.2025.
-// //
+//
 
 import UIKit
 
