@@ -61,7 +61,9 @@ extension ImagesListViewController {
 }
 
 extension ImagesListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "ShowSingleImage", sender: indexPath)
+    }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         guard let image = UIImage(named: photosName[indexPath.row]) else {
@@ -76,3 +78,4 @@ extension ImagesListViewController: UITableViewDelegate {
         return cellHeight
     }
 }
+
