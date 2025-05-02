@@ -12,10 +12,10 @@ final class SingleImageViewController: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     
-//    override func viewDidLoad() {
-//        super.viewDidLoad()
-//        imageView.image = image
-//    }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        imageView.image = image
+    }
     
     
 }
