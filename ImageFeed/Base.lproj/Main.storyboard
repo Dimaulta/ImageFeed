@@ -195,6 +195,7 @@
                     </view>
                     <navigationItem key="navigationItem" id="Kl8-OS-IFj"/>
                     <connections>
+                        <outlet property="progressView" destination="li3-26-Sb3" id="DMb-if-nBz"/>
                         <outlet property="webView" destination="mX2-rb-8ZX" id="Nuq-g2-eUe"/>
                     </connections>
                 </viewController>
