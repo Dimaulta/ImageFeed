@@ -128,9 +128,10 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="NPU-ti-ZAl"/>
                                 </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
                                 <color key="tintColor" name="YP Black"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Войти"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" title="Войти"/>
                                 <userDefinedRuntimeAttributes>
                                     <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
                                         <integer key="value" value="16"/>
@@ -162,7 +163,6 @@
         <!--Web View View Controller-->
         <scene sceneID="7iL-wb-SHb">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="ePy-Gr-LCO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <viewController id="tgy-AR-fV6" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="RU9-tb-w81">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
@@ -199,6 +199,7 @@
                         <outlet property="webView" destination="mX2-rb-8ZX" id="Nuq-g2-eUe"/>
                     </connections>
                 </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ePy-Gr-LCO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-1468" y="94"/>
         </scene>
