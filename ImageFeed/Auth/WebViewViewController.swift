@@ -2,7 +2,7 @@
 //  WebViewViewController.swift
 //  ImageFeed
 //
-//  Created by Ульта on 17.05.2025.
+//  Created by Ульта on 17.05.2025..
 //
 
 import UIKit
