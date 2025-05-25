@@ -3,7 +3,7 @@
 //  ImageFeed
 //
 //  Created by Ульта on 01.05.2025.
-//
+///
 
 import UIKit
 
@@ -37,11 +37,22 @@ final class ProfileViewController: UIViewController {
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let exitButton = UIButton.systemButton(
-            with: UIImage(named: "Exit")!.withRenderingMode(.alwaysOriginal),
-            target: self,
-            action: #selector(Self.didTapButton)
-        )
+        let exitButton: UIButton
+        do {
+            guard let exitImage = UIImage(named: "Exit") else {
+                throw NSError(domain: "ImageLoading", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to load exit image"])
+            }
+            
+            exitButton = UIButton.systemButton(
+                with: exitImage.withRenderingMode(.alwaysOriginal),
+                target: self,
+                action: #selector(Self.didTapButton)
+            )
+        } catch {
+            print("Error loading exit image: \(error.localizedDescription)")
+            exitButton = UIButton(type: .system)
+            exitButton.setTitle("Exit", for: .normal)
+        }
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(avatarImageView)
