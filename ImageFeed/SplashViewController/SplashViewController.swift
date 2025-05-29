@@ -2,7 +2,7 @@
 //  SplashViewController.swift
 //  ImageFeed
 //
-//  Created by Ульта on 21.05.2025.
+//  Created by Ульта on 21.05.2025
 //
 
 import UIKit
