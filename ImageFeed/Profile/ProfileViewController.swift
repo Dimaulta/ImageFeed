@@ -8,31 +8,44 @@
 import UIKit
 
 final class ProfileViewController: UIViewController {
+    private let profileService = ProfileService.shared
+    
+    private var userNameLabel: UILabel!
+    private var loginNameLabel: UILabel!
+    private var descriptionLabel: UILabel!
+    
     @IBAction private func didTapLogoutButton() {
     }
-    
-    private var label: UILabel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupUI()
+        updateProfileDetails()
+    }
+    
+    private func updateProfileDetails() {
+        guard let profile = profileService.profile else { return }
+        userNameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    private func setupUI() {
         let avatarImageView = UIImageView(image: UIImage(named: "Avatar"))
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        let userNameLabel = UILabel()
-        userNameLabel.text = "Екатерина Новикова"
+        userNameLabel = UILabel()
         userNameLabel.textColor = UIColor(named: "YP White")
         userNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         userNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let loginNameLabel = UILabel()
-        loginNameLabel.text = "@ekaterina_nov"
+        loginNameLabel = UILabel()
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = "Hello, world!"
+        descriptionLabel = UILabel()
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -89,9 +102,6 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
-        label?.removeFromSuperview()
-        label = nil
-        
         for view in view.subviews {
             if view is UILabel {
                 view.removeFromSuperview()
