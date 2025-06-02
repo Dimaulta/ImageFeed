@@ -61,20 +61,20 @@ final class OAuth2Service {
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 
-                switch result {
-                case .success(let data):
-                    do {
-                        let decoder = JSONDecoder()
-                        let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
-                        self.tokenStorage.token = response.access_token
+            switch result {
+            case .success(let data):
+                do {
+                    let decoder = JSONDecoder()
+                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                    self.tokenStorage.token = response.access_token
                         completion(.success(response.access_token))
-                    } catch {
-                        print("[OAuth2Service] Ошибка декодирования: \(error)")
-                        completion(.failure(error))
-                    }
-                case .failure(let error):
-                    print("[OAuth2Service] Сетевая ошибка: \(error)")
+                } catch {
+                    print("[OAuth2Service] Ошибка декодирования: \(error)")
                     completion(.failure(error))
+                }
+            case .failure(let error):
+                print("[OAuth2Service] Сетевая ошибка: \(error)")
+                completion(.failure(error))
                 }
                 
                 self.task = nil
