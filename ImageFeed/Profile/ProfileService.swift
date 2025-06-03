@@ -36,27 +36,20 @@ final class ProfileService {
             return
         }
         
-        let task = urlSession.data(for: request) { [weak self] result in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 
                 switch result {
-                case .success(let data):
-                    do {
-                        let decoder = JSONDecoder()
-                        let profileResult = try decoder.decode(ProfileResult.self, from: data)
-                        let profile = Profile(
-                            username: profileResult.username,
-                            name: "\(profileResult.firstName ?? "") \(profileResult.lastName ?? "")".trimmingCharacters(in: .whitespaces),
-                            loginName: "@\(profileResult.username)",
-                            bio: profileResult.bio ?? ""
-                        )
-                        self.profile = profile
-                        completion(.success(profile))
-                    } catch {
-                        print("[ProfileService] Ошибка декодирования: \(error)")
-                        completion(.failure(error))
-                    }
+                case .success(let profileResult):
+                    let profile = Profile(
+                        username: profileResult.username,
+                        name: "\(profileResult.firstName ?? "") \(profileResult.lastName ?? "")".trimmingCharacters(in: .whitespaces),
+                        loginName: "@\(profileResult.username)",
+                        bio: profileResult.bio ?? ""
+                    )
+                    self.profile = profile
+                    completion(.success(profile))
                 case .failure(let error):
                     print("[ProfileService] Сетевая ошибка: \(error)")
                     completion(.failure(error))

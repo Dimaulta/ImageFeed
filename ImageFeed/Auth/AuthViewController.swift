@@ -60,8 +60,13 @@ extension AuthViewController: WebViewViewControllerDelegate {
                     } // закрывающий флаг для ProgressHUD
                 }
             case .failure:
-                // TODO [Sprint 11] Добавьте обработку ошибки
-                break
+                let alert = UIAlertController(
+                    title: "Что-то пошло не так",
+                    message: "Не удалось войти в систему",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "Ок", style: .default))
+                self.present(alert, animated: true)
             }
         }
     }

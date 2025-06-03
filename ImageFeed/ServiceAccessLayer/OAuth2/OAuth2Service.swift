@@ -44,6 +44,7 @@ final class OAuth2Service {
         assert(Thread.isMainThread)
         
         guard lastCode != code else {
+            print("[OAuth2Service] Повторный запрос с тем же кодом")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
@@ -57,24 +58,17 @@ final class OAuth2Service {
             return
         }
         
-        let task = urlSession.data(for: request) { [weak self] result in
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 
-            switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                switch result {
+                case .success(let response):
                     self.tokenStorage.token = response.access_token
-                        completion(.success(response.access_token))
-                } catch {
-                    print("[OAuth2Service] Ошибка декодирования: \(error)")
+                    completion(.success(response.access_token))
+                case .failure(let error):
+                    print("[OAuth2Service] Сетевая ошибка: \(error)")
                     completion(.failure(error))
-                }
-            case .failure(let error):
-                print("[OAuth2Service] Сетевая ошибка: \(error)")
-                completion(.failure(error))
                 }
                 
                 self.task = nil
