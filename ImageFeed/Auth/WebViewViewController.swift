@@ -38,7 +38,7 @@ final class WebViewViewController: UIViewController {
             self.updateProgress()
         }
     }
-    
+     
     private func loadAuthView() {
         guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else {
             print("[WebView] Не удалось создать URLComponents")
