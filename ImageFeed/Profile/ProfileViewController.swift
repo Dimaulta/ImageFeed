@@ -6,11 +6,13 @@
 ///
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     private let profileService = ProfileService.shared
     private var profileImageServiceObserver: NSObjectProtocol?
     
+    private var avatarImageView: UIImageView!
     private var userNameLabel: UILabel!
     private var loginNameLabel: UILabel!
     private var descriptionLabel: UILabel!
@@ -41,7 +43,32 @@ final class ProfileViewController: UIViewController {
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
         else { return }
-        // TODO [Sprint 11] Обновить аватар, используя Kingfisher
+        
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        let cache = ImageCache.default
+        
+        cache.clearMemoryCache()
+        cache.clearDiskCache()
+        
+        avatarImageView.kf.indicatorType = .activity
+        
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "Stub"),
+            options: [
+                .processor(processor),
+                .transition(.fade(0.5))
+            ]
+        ) { result in
+            switch result {
+            case .success(let value):
+                print("Изображение успешно загружено")
+                print("Источник: \(value.source)")
+                print("Тип кэша: \(value.cacheType)")
+            case .failure(let error):
+                print("Ошибка загрузки изображения: \(error)")
+            }
+        }
     }
     
     private func updateProfileDetails() {
@@ -52,7 +79,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupUI() {
-        let avatarImageView = UIImageView(image: UIImage(named: "Avatar"))
+        avatarImageView = UIImageView(image: UIImage(named: "Avatar"))
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         
         userNameLabel = UILabel()
