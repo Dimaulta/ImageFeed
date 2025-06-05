@@ -49,6 +49,7 @@ final class ProfileImageService {
                 case .success(let userResult):
                     let profileImageURL = userResult.profileImage.medium
                     self.avatarURL = profileImageURL
+                    UserDefaults.standard.set(profileImageURL, forKey: "LastAvatarURL")
                     completion(.success(profileImageURL))
                     
                     NotificationCenter.default

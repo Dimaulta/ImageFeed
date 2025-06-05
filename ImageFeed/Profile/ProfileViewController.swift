@@ -26,19 +26,28 @@ final class ProfileViewController: UIViewController {
         setupUI()
         updateProfileDetails()
         
+        avatarImageView.image = UIImage(named: "Stub")
+        
         profileImageServiceObserver = NotificationCenter.default
             .addObserver(
                 forName: ProfileImageService.didChangeNotification,
                 object: nil,
                 queue: .main
-            ) { [weak self] _ in
-                guard let self = self else { return }
+            ) { [weak self] notification in
+                guard let self = self,
+                      let userInfo = notification.userInfo,
+                      let url = userInfo["URL"] as? String else { return }
                 self.updateAvatar()
             }
-        updateAvatar()
+        
+        if ProfileImageService.shared.avatarURL != nil {
+            updateAvatar()
+        }
     }
     
     private func updateAvatar() {
+        avatarImageView.image = UIImage(named: "Stub")
+        
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
@@ -67,6 +76,7 @@ final class ProfileViewController: UIViewController {
                 print("Тип кэша: \(value.cacheType)")
             case .failure(let error):
                 print("Ошибка загрузки изображения: \(error)")
+                self.avatarImageView.image = UIImage(named: "Stub")
             }
         }
     }
@@ -79,7 +89,7 @@ final class ProfileViewController: UIViewController {
     }
     
     private func setupUI() {
-        avatarImageView = UIImageView(image: UIImage(named: "Avatar"))
+        avatarImageView = UIImageView()
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         
         userNameLabel = UILabel()
