@@ -6,33 +6,105 @@
 ///
 
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
+    private let profileService = ProfileService.shared
+    private var profileImageServiceObserver: NSObjectProtocol?
+    
+    private var avatarImageView: UIImageView!
+    private var userNameLabel: UILabel!
+    private var loginNameLabel: UILabel!
+    private var descriptionLabel: UILabel!
+    
     @IBAction private func didTapLogoutButton() {
     }
-    
-    private var label: UILabel?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let avatarImageView = UIImageView(image: UIImage(named: "Avatar"))
+        view.backgroundColor = UIColor(named: "YP Black")
+        
+        setupUI()
+        updateProfileDetails()
+        
+        avatarImageView.image = UIImage(named: "Stub")
+        
+        profileImageServiceObserver = NotificationCenter.default
+            .addObserver(
+                forName: ProfileImageService.didChangeNotification,
+                object: nil,
+                queue: .main
+            ) { [weak self] notification in
+                guard let self = self,
+                      let userInfo = notification.userInfo,
+                      let url = userInfo["URL"] as? String else { return }
+                self.updateAvatar()
+            }
+        
+        if ProfileImageService.shared.avatarURL != nil {
+            updateAvatar()
+        }
+    }
+    
+    private func updateAvatar() {
+        avatarImageView.image = UIImage(named: "Stub")
+        
+        guard
+            let profileImageURL = ProfileImageService.shared.avatarURL,
+            let url = URL(string: profileImageURL)
+        else { return }
+        
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        let cache = ImageCache.default
+        
+        cache.clearMemoryCache()
+        cache.clearDiskCache()
+        
+        avatarImageView.kf.indicatorType = .activity
+        
+        avatarImageView.kf.setImage(
+            with: url,
+            placeholder: UIImage(named: "Stub"),
+            options: [
+                .processor(processor),
+                .transition(.fade(0.5))
+            ]
+        ) { result in
+            switch result {
+            case .success(let value):
+                print("Изображение успешно загружено")
+                print("Источник: \(value.source)")
+                print("Тип кэша: \(value.cacheType)")
+            case .failure(let error):
+                print("Ошибка загрузки изображения: \(error)")
+                self.avatarImageView.image = UIImage(named: "Stub")
+            }
+        }
+    }
+    
+    private func updateProfileDetails() {
+        guard let profile = profileService.profile else { return }
+        userNameLabel.text = profile.name
+        loginNameLabel.text = profile.loginName
+        descriptionLabel.text = profile.bio
+    }
+    
+    private func setupUI() {
+        avatarImageView = UIImageView()
         avatarImageView.translatesAutoresizingMaskIntoConstraints = false
         
-        let userNameLabel = UILabel()
-        userNameLabel.text = "Екатерина Новикова"
+        userNameLabel = UILabel()
         userNameLabel.textColor = UIColor(named: "YP White")
         userNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         userNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let loginNameLabel = UILabel()
-        loginNameLabel.text = "@ekaterina_nov"
+        loginNameLabel = UILabel()
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        let descriptionLabel = UILabel()
-        descriptionLabel.text = "Hello, world!"
+        descriptionLabel = UILabel()
         descriptionLabel.textColor = UIColor(named: "YP White")
         descriptionLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         descriptionLabel.translatesAutoresizingMaskIntoConstraints = false
@@ -89,9 +161,6 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapButton() {
-        label?.removeFromSuperview()
-        label = nil
-        
         for view in view.subviews {
             if view is UILabel {
                 view.removeFromSuperview()
