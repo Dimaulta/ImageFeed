@@ -85,8 +85,13 @@ final class SplashViewController: UIViewController {
                 ProfileImageService.shared.fetchProfileImageURL(username: profile.username) { _ in }
                 self.switchToTabBarController()
             case .failure:
-                // TODO [Sprint 11] Покажите ошибку получения профиля
-                break
+                let alert = UIAlertController(
+                    title: "Что-то пошло не так",
+                    message: "Не удалось войти в систему",
+                    preferredStyle: .alert
+                )
+                alert.addAction(UIAlertAction(title: "Ок", style: .default))
+                self.present(alert, animated: true)
             }
         }
     }
