@@ -7,10 +7,18 @@
 
 import UIKit
 
+enum AuthServiceError: Error {
+    case invalidRequest
+}
+
 final class OAuth2Service {
     static let shared = OAuth2Service()
     private init() {}
+    
     private let tokenStorage = OAuth2TokenStorage()
+    private let urlSession = URLSession.shared
+    private var task: URLSessionTask?
+    private var lastCode: String?
     
     func makeOAuthTokenRequest(code: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://unsplash.com") else { return nil }
@@ -33,30 +41,42 @@ final class OAuth2Service {
     }
     
     func fetchOAuthToken(code: String, completion: @escaping (Result<String, Error>) -> Void) {
-        guard let request = makeOAuthTokenRequest(code: code) else {
-            print("[OAuth2Service] Не удалось создать запрос")
-            completion(.failure(NSError(domain: "OAuth2Service", code: -1, userInfo: [NSLocalizedDescriptionKey: "Не удалось создать запрос"])))
+        assert(Thread.isMainThread)
+        
+        guard lastCode != code else {
+            print("[OAuth2Service] Повторный запрос с тем же кодом")
+            completion(.failure(AuthServiceError.invalidRequest))
             return
         }
-        let task = URLSession.shared.data(for: request) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let response = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+        
+        task?.cancel()
+        lastCode = code
+        
+        guard let request = makeOAuthTokenRequest(code: code) else {
+            print("[OAuth2Service] Не удалось создать запрос")
+            completion(.failure(AuthServiceError.invalidRequest))
+            return
+        }
+        
+        let task = urlSession.objectTask(for: request) { [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                
+                switch result {
+                case .success(let response):
                     self.tokenStorage.token = response.access_token
-                    DispatchQueue.main.async {
-                        completion(.success(response.access_token))
-                    }
-                } catch {
-                    print("[OAuth2Service] Ошибка декодирования: \(error)")
+                    completion(.success(response.access_token))
+                case .failure(let error):
+                    print("[OAuth2Service] Сетевая ошибка: \(error)")
                     completion(.failure(error))
                 }
-            case .failure(let error):
-                print("[OAuth2Service] Сетевая ошибка: \(error)")
-                completion(.failure(error))
+                
+                self.task = nil
+                self.lastCode = nil
             }
         }
+        
+        self.task = task
         task.resume()
     }
 }
