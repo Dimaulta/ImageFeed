@@ -1,7 +1,7 @@
 //
 //  ImagesListService.swift
 //  ImageFeed
-//
+// /
 //  Created by Ульта on 19.06.2025.
 //
 
