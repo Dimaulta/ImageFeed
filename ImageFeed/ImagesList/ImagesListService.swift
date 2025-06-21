@@ -15,7 +15,7 @@ struct PhotoResult: Decodable {
     let description: String?
     let likedByUser: Bool
     let urls: UrlsResult
-
+    
     enum CodingKeys: String, CodingKey {
         case id, width, height, description, urls
         case createdAt = "created_at"
@@ -45,11 +45,11 @@ final class ImagesListService {
     private var isLoading = false
     private let perPage = 10
     private let accessKey = "dUaraL4pnNKKk33SBBErYg7636WPwKbCDkx3N5y5mTo"
-
+    
     func fetchPhotosNextPage() {
         guard !isLoading else { return }
         isLoading = true
-
+        
         let nextPage = (lastLoadedPage ?? 0) + 1
         let urlString = "https://api.unsplash.com/photos?page=\(nextPage)&per_page=\(perPage)"
         guard let url = URL(string: urlString) else {
@@ -58,11 +58,11 @@ final class ImagesListService {
         }
         var request = URLRequest(url: url)
         request.setValue("Client-ID \(accessKey)", forHTTPHeaderField: "Authorization")
-
+        
         let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
             self.isLoading = false
-
+            
             if let data = data {
                 do {
                     let decoder = JSONDecoder()
