@@ -89,6 +89,7 @@ extension ImagesListViewController: UITableViewDataSource {
             return UITableViewCell()
         }
         
+        imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         
         return imageListCell
@@ -126,8 +127,7 @@ extension ImagesListViewController {
             cell.dateLabel.text = ""
         }
         
-        let likeImage = photo.isLiked ? UIImage(named: "like_button_on") : UIImage(named: "like_button_off")
-        cell.likeButton.setImage(likeImage, for: .normal)
+        cell.setIsLiked(photo.isLiked)
     }
 }
 
@@ -149,6 +149,44 @@ extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         if indexPath.row + 1 == photos.count {
             imagesListService.fetchPhotosNextPage()
+        }
+    }
+}
+
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        
+        UIBlockingProgressHUD.show()
+        
+        imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
+            guard let self = self else { return }
+            
+            switch result {
+            case .success:
+                let oldPhoto = self.photos[indexPath.row]
+                let newPhoto = Photo(
+                    id: oldPhoto.id,
+                    size: oldPhoto.size,
+                    createdAt: oldPhoto.createdAt,
+                    welcomeDescription: oldPhoto.welcomeDescription,
+                    thumbImageURL: oldPhoto.thumbImageURL,
+                    largeImageURL: oldPhoto.largeImageURL,
+                    isLiked: !oldPhoto.isLiked
+                )
+                self.photos[indexPath.row] = newPhoto
+                
+                if let visibleCell = self.tableView.cellForRow(at: indexPath) as? ImagesListCell {
+                    visibleCell.setIsLiked(newPhoto.isLiked)
+                }
+                
+                UIBlockingProgressHUD.dismiss()
+            case .failure:
+                UIBlockingProgressHUD.dismiss()
+                // TODO: Показать ошибку с использованием UIAlertController
+                print("Failed to change like status")
+            }
         }
     }
 }

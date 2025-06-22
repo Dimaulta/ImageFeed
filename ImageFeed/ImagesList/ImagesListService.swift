@@ -45,6 +45,7 @@ final class ImagesListService {
     private var isLoading = false
     private let perPage = 10
     private let accessKey = "dUaraL4pnNKKk33SBBErYg7636WPwKbCDkx3N5y5mTo"
+    private let urlSession = URLSession.shared
     
     func fetchPhotosNextPage() {
         guard !isLoading else { return }
@@ -88,6 +89,39 @@ final class ImagesListService {
                 }
             } else if let error = error {
                 print("Ошибка загрузки: \(error)")
+            }
+        }
+        task.resume()
+    }
+
+    func changeLike(photoId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        guard let token = OAuth2TokenStorage().token else {
+            completion(.failure(ProfileServiceError.invalidRequest))
+            return
+        }
+
+        guard let url = URL(string: "https://api.unsplash.com/photos/\(photoId)/like") else {
+            completion(.failure(ProfileServiceError.invalidRequest))
+            return
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = isLike ? "POST" : "DELETE"
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        let task = urlSession.dataTask(with: request) { _, response, error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    completion(.failure(error))
+                    return
+                }
+
+                if let response = response as? HTTPURLResponse,
+                   (200..<300).contains(response.statusCode) {
+                    completion(.success(()))
+                } else {
+                    completion(.failure(ProfileServiceError.invalidRequest))
+                }
             }
         }
         task.resume()
