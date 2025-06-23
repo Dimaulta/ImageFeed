@@ -16,6 +16,12 @@ final class ProfileService {
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     
+    func reset() {
+        profile = nil
+        task?.cancel()
+        task = nil
+    }
+    
     private func makeProfileRequest(token: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://api.unsplash.com") else { return nil }
         guard let url = URL(string: "/me", relativeTo: baseURL) else { return nil }

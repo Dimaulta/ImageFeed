@@ -39,6 +39,7 @@ struct Photo {
 }
 
 final class ImagesListService {
+    static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     private(set) var photos: [Photo] = []
     private var lastLoadedPage: Int?
@@ -46,6 +47,12 @@ final class ImagesListService {
     private let perPage = 10
     private let accessKey = "dUaraL4pnNKKk33SBBErYg7636WPwKbCDkx3N5y5mTo"
     private let urlSession = URLSession.shared
+    
+    func reset() {
+        photos = []
+        lastLoadedPage = nil
+        isLoading = false
+    }
     
     func fetchPhotosNextPage() {
         guard !isLoading else { return }

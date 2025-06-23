@@ -17,6 +17,13 @@ final class ProfileImageService {
     private let urlSession = URLSession.shared
     private var task: URLSessionTask?
     
+    func reset() {
+        avatarURL = nil
+        task?.cancel()
+        task = nil
+        UserDefaults.standard.removeObject(forKey: "LastAvatarURL")
+    }
+    
     private func makeProfileImageRequest(username: String) -> URLRequest? {
         guard let baseURL = URL(string: "https://api.unsplash.com") else { return nil }
         guard let url = URL(string: "/users/\(username)", relativeTo: baseURL) else { return nil }
