@@ -9,12 +9,7 @@ import UIKit
 import Kingfisher
 
 final class SingleImageViewController: UIViewController {
-    var imageURL: URL? {
-        didSet {
-            guard isViewLoaded, let url = imageURL else { return }
-            loadImage(from: url)
-        }
-    }
+    var imageURL: URL?
     
     private var image: UIImage? {
         didSet {
@@ -34,25 +29,36 @@ final class SingleImageViewController: UIViewController {
         scrollView.maximumZoomScale = 1.25
         
         if let url = imageURL {
-            loadImage(from: url)
+            loadFullImage(from: url)
         }
     }
     
-    private func loadImage(from url: URL) {
+    private func loadFullImage(from url: URL) {
         UIBlockingProgressHUD.show()
         imageView.kf.setImage(with: url) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
-            
             guard let self = self else { return }
             switch result {
             case .success(let imageResult):
                 self.image = imageResult.image
                 self.rescaleAndCenterImageInScrollView(image: imageResult.image)
             case .failure:
-                
-                print("Error loading image")
+                self.showError(url: url)
             }
         }
+    }
+    
+    private func showError(url: URL) {
+        let alert = UIAlertController(
+            title: "Что-то пошло не так",
+            message: "Попробовать ещё раз?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Не надо", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Повторить", style: .default) { [weak self] _ in
+            self?.loadFullImage(from: url)
+        })
+        present(alert, animated: true)
     }
     
     @IBAction private func didTapBackButton() {
