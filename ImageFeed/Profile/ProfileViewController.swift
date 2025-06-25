@@ -19,11 +19,19 @@ final class ProfileViewController: UIViewController {
     
     @objc
     private func didTapLogoutButton() {
-        ProfileLogoutService.shared.logout()
-        // Переход на начальный экран (SplashViewController)
-        guard let window = UIApplication.shared.windows.first else { return }
-        let splashVC = SplashViewController()
-        window.rootViewController = splashVC
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Нет", style: .cancel))
+        alert.addAction(UIAlertAction(title: "Да", style: .destructive) { [weak self] _ in
+            ProfileLogoutService.shared.logout()
+            guard let window = UIApplication.shared.windows.first else { return }
+            let splashVC = SplashViewController()
+            window.rootViewController = splashVC
+        })
+        present(alert, animated: true)
     }
     
     override func viewDidLoad() {
