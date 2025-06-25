@@ -24,13 +24,13 @@ final class ProfileViewController: UIViewController {
             message: "Уверены что хотите выйти?",
             preferredStyle: .alert
         )
-        alert.addAction(UIAlertAction(title: "Нет", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Да", style: .destructive) { [weak self] _ in
+        alert.addAction(UIAlertAction(title: "Да", style: .default) { [weak self] _ in
             ProfileLogoutService.shared.logout()
             guard let window = UIApplication.shared.windows.first else { return }
             let splashVC = SplashViewController()
             window.rootViewController = splashVC
         })
+        alert.addAction(UIAlertAction(title: "Нет", style: .default))
         present(alert, animated: true)
     }
     

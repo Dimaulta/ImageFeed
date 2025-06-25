@@ -41,6 +41,8 @@ struct Photo {
 final class ImagesListService {
     static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
+    private static let dateFormatter = ISO8601DateFormatter()
+    
     private(set) var photos: [Photo] = []
     private var lastLoadedPage: Int?
     private var isLoading = false
@@ -67,7 +69,7 @@ final class ImagesListService {
         var request = URLRequest(url: url)
         request.setValue("Client-ID \(accessKey)", forHTTPHeaderField: "Authorization")
         
-        let task = URLSession.shared.dataTask(with: request) { [weak self] data, response, error in
+        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
             guard let self = self else { return }
             self.isLoading = false
             
@@ -79,7 +81,7 @@ final class ImagesListService {
                         Photo(
                             id: result.id,
                             size: CGSize(width: result.width, height: result.height),
-                            createdAt: ISO8601DateFormatter().date(from: result.createdAt ?? ""),
+                            createdAt: Self.dateFormatter.date(from: result.createdAt ?? ""),
                             welcomeDescription: result.description,
                             thumbImageURL: result.urls.thumb,
                             largeImageURL: result.urls.full,
