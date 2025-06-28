@@ -17,7 +17,21 @@ final class ProfileViewController: UIViewController {
     private var loginNameLabel: UILabel!
     private var descriptionLabel: UILabel!
     
-    @IBAction private func didTapLogoutButton() {
+    @objc
+    private func didTapLogoutButton() {
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Да", style: .default) { [weak self] _ in
+            ProfileLogoutService.shared.logout()
+            guard let window = UIApplication.shared.windows.first else { return }
+            let splashVC = SplashViewController()
+            window.rootViewController = splashVC
+        })
+        alert.addAction(UIAlertAction(title: "Нет", style: .default))
+        present(alert, animated: true)
     }
     
     override func viewDidLoad() {
@@ -114,16 +128,16 @@ final class ProfileViewController: UIViewController {
             guard let exitImage = UIImage(named: "Exit") else {
                 throw NSError(domain: "ImageLoading", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to load exit image"])
             }
-            
             exitButton = UIButton.systemButton(
                 with: exitImage.withRenderingMode(.alwaysOriginal),
                 target: self,
-                action: #selector(Self.didTapButton)
+                action: #selector(Self.didTapLogoutButton)
             )
         } catch {
             print("Error loading exit image: \(error.localizedDescription)")
             exitButton = UIButton(type: .system)
             exitButton.setTitle("Exit", for: .normal)
+            exitButton.addTarget(self, action: #selector(Self.didTapLogoutButton), for: .touchUpInside)
         }
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         
@@ -157,14 +171,5 @@ final class ProfileViewController: UIViewController {
             exitButton.widthAnchor.constraint(equalToConstant: 44),
             exitButton.heightAnchor.constraint(equalToConstant: 44)
         ])
-    }
-    
-    @objc
-    private func didTapButton() {
-        for view in view.subviews {
-            if view is UILabel {
-                view.removeFromSuperview()
-            }
-        }
     }
 }
