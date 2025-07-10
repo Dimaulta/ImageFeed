@@ -102,11 +102,13 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
         userNameLabel.textColor = UIColor(named: "YP White")
         userNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        userNameLabel.accessibilityIdentifier = "Name Lastname"
         
         loginNameLabel = UILabel()
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        loginNameLabel.accessibilityIdentifier = "@username"
         
         descriptionLabel = UILabel()
         descriptionLabel.textColor = UIColor(named: "YP White")
@@ -130,6 +132,7 @@ final class ProfileViewController: UIViewController & ProfileViewControllerProto
             exitButton.addTarget(self, action: #selector(Self.didTapLogoutButton), for: .touchUpInside)
         }
         exitButton.translatesAutoresizingMaskIntoConstraints = false
+        exitButton.accessibilityIdentifier = "logout button"
         
         view.addSubview(avatarImageView)
         view.addSubview(userNameLabel)

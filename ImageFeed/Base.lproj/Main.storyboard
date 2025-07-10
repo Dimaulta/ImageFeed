@@ -41,7 +41,6 @@
                                                 </imageView>
                                                 <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Sjf-8T-Vxg" userLabel="Like Button">
                                                     <rect key="frame" x="333" y="4" width="44" height="44"/>
-                                                    <accessibility key="accessibilityConfiguration" identifier="likeButton"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="44" id="7bW-qu-dFS"/>
                                                         <constraint firstAttribute="height" constant="44" id="kTD-xg-SBs"/>
@@ -128,6 +127,7 @@
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="o22-60-FpM">
                                 <rect key="frame" x="16" y="680" width="361" height="48"/>
                                 <color key="backgroundColor" name="YP White"/>
+                                <accessibility key="accessibilityConfiguration" identifier="Authenticate"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="NPU-ti-ZAl"/>
                                 </constraints>
@@ -171,7 +171,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mX2-rb-8ZX">
+                            <wkWebView contentMode="scaleToFill" restorationIdentifier="UnsplashWebView" translatesAutoresizingMaskIntoConstraints="NO" id="mX2-rb-8ZX">
                                 <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                                 <color key="backgroundColor" name="YP White"/>
                                 <wkWebViewConfiguration key="configuration">
@@ -248,6 +248,7 @@
                             </scrollView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VGl-FM-XAj">
                                 <rect key="frame" x="8" y="8" width="48" height="48"/>
+                                <accessibility key="accessibilityConfiguration" identifier="nav back button white"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="L9Y-G2-aFW"/>
                                     <constraint firstAttribute="width" constant="48" id="P4t-fc-LcF"/>
