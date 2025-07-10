@@ -60,7 +60,7 @@ final class ImagesListTests: XCTestCase {
         // given
         var presenter = ImagesListPresenterSpy()
         // when
-        presenter.didTapLike(at: 0)
+        presenter.didTapLike(at: 0) { }
         // then
         XCTAssertEqual(presenter.didTapLikeIndex, 0)
     }

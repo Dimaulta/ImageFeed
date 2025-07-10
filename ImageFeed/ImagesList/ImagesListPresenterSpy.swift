@@ -18,8 +18,9 @@ final class ImagesListPresenterSpy: ImagesListPresenterProtocol {
         viewDidLoadCalled = true
     }
     
-    func didTapLike(at index: Int) {
+    func didTapLike(at index: Int, completion: @escaping () -> Void) {
         didTapLikeIndex = index
+        completion()
     }
     
     func willDisplayCell(at index: Int) {

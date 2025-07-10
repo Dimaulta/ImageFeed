@@ -17,7 +17,7 @@ protocol ImagesListPresenterProtocol: AnyObject {
     var view: ImagesListViewControllerProtocol? { get set }
     var photos: [Photo] { get }
     func viewDidLoad()
-    func didTapLike(at index: Int)
+    func didTapLike(at index: Int, completion: @escaping () -> Void)
     func willDisplayCell(at index: Int)
 }
 
@@ -44,14 +44,15 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
         let oldCount = photos.count
         let newCount = imagesListService.photos.count
         if oldCount == newCount { return }
+        
         photos = imagesListService.photos
         view?.updateTableAnimated(oldCount: oldCount, newCount: newCount)
     }
     
-    func didTapLike(at index: Int) {
+    func didTapLike(at index: Int, completion: @escaping () -> Void) {
         let photo = photos[index]
         imagesListService.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            guard let self = self else { return }
+            guard let self = self else { completion(); return }
             switch result {
             case .success:
                 let oldPhoto = self.photos[index]
@@ -66,8 +67,10 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
                 )
                 self.photos[index] = newPhoto
                 self.view?.reloadTable()
+                completion()
             case .failure:
                 self.view?.showLikeError()
+                completion()
             }
         }
     }

@@ -38,12 +38,9 @@ final class ImagesListViewController: UIViewController, ImagesListViewController
     
     func updateTableAnimated(oldCount: Int, newCount: Int) {
         if oldCount == newCount { return }
-        tableView.performBatchUpdates {
-            let newIndexPaths = (oldCount..<newCount).map { index in
-                IndexPath(row: index, section: 0)
-            }
-            tableView.insertRows(at: newIndexPaths, with: .automatic)
-        } completion: { _ in }
+        
+        // Всегда используем reloadData для избежания конфликтов
+        tableView.reloadData()
     }
     
     func reloadTable() {
@@ -144,7 +141,8 @@ extension ImagesListViewController: ImagesListCellDelegate {
     func imageListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView.indexPath(for: cell) else { return }
         UIBlockingProgressHUD.show()
-        presenter.didTapLike(at: indexPath.row)
-        UIBlockingProgressHUD.dismiss()
+        presenter.didTapLike(at: indexPath.row) {
+            UIBlockingProgressHUD.dismiss()
+        }
     }
 }
