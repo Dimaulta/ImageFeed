@@ -8,9 +8,13 @@
 import UIKit
 import Kingfisher
 
-final class ProfileViewController: UIViewController {
-    private let profileService = ProfileService.shared
-    private var profileImageServiceObserver: NSObjectProtocol?
+final class ProfileViewController: UIViewController & ProfileViewControllerProtocol {
+    private var presenter: ProfilePresenterProtocol!
+    
+    func configure<T: ProfilePresenterProtocol>(_ presenter: inout T) {
+        self.presenter = presenter
+        presenter.view = self
+    }
     
     private var avatarImageView: UIImageView!
     private var userNameLabel: UILabel!
@@ -18,20 +22,8 @@ final class ProfileViewController: UIViewController {
     private var descriptionLabel: UILabel!
     
     @objc
-    private func didTapLogoutButton() {
-        let alert = UIAlertController(
-            title: "Пока, пока!",
-            message: "Уверены что хотите выйти?",
-            preferredStyle: .alert
-        )
-        alert.addAction(UIAlertAction(title: "Да", style: .default) { [weak self] _ in
-            ProfileLogoutService.shared.logout()
-            guard let window = UIApplication.shared.windows.first else { return }
-            let splashVC = SplashViewController()
-            window.rootViewController = splashVC
-        })
-        alert.addAction(UIAlertAction(title: "Нет", style: .default))
-        present(alert, animated: true)
+    func didTapLogoutButton() {
+        presenter.didTapLogoutButton()
     }
     
     override func viewDidLoad() {
@@ -40,34 +32,19 @@ final class ProfileViewController: UIViewController {
         view.backgroundColor = UIColor(named: "YP Black")
         
         setupUI()
-        updateProfileDetails()
+        presenter.viewDidLoad()
         
         avatarImageView.image = UIImage(named: "Stub")
-        
-        profileImageServiceObserver = NotificationCenter.default
-            .addObserver(
-                forName: ProfileImageService.didChangeNotification,
-                object: nil,
-                queue: .main
-            ) { [weak self] notification in
-                guard let self = self,
-                      let userInfo = notification.userInfo,
-                      let url = userInfo["URL"] as? String else { return }
-                self.updateAvatar()
-            }
-        
-        if ProfileImageService.shared.avatarURL != nil {
-            updateAvatar()
-        }
     }
     
-    private func updateAvatar() {
+    func updateProfileDetails(name: String, loginName: String, bio: String) {
+        userNameLabel.text = name
+        loginNameLabel.text = loginName
+        descriptionLabel.text = bio
+    }
+    
+    func updateAvatar(with url: URL) {
         avatarImageView.image = UIImage(named: "Stub")
-        
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
         
         let processor = RoundCornerImageProcessor(cornerRadius: 35)
         let cache = ImageCache.default
@@ -97,11 +74,24 @@ final class ProfileViewController: UIViewController {
         }
     }
     
-    private func updateProfileDetails() {
-        guard let profile = profileService.profile else { return }
-        userNameLabel.text = profile.name
-        loginNameLabel.text = profile.loginName
-        descriptionLabel.text = profile.bio
+    func showLogoutAlert() {
+        let alert = UIAlertController(
+            title: "Пока, пока!",
+            message: "Уверены что хотите выйти?",
+            preferredStyle: .alert
+        )
+        alert.addAction(UIAlertAction(title: "Да", style: .default) { [weak self] _ in
+            self?.logout()
+        })
+        alert.addAction(UIAlertAction(title: "Нет", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func logout() {
+        ProfileLogoutService.shared.logout()
+        guard let window = UIApplication.shared.windows.first else { return }
+        let splashVC = SplashViewController()
+        window.rootViewController = splashVC
     }
     
     private func setupUI() {
@@ -112,11 +102,13 @@ final class ProfileViewController: UIViewController {
         userNameLabel.textColor = UIColor(named: "YP White")
         userNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         userNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        userNameLabel.accessibilityIdentifier = "Name Lastname"
         
         loginNameLabel = UILabel()
         loginNameLabel.textColor = UIColor(named: "YP Gray")
         loginNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .regular)
         loginNameLabel.translatesAutoresizingMaskIntoConstraints = false
+        loginNameLabel.accessibilityIdentifier = "@username"
         
         descriptionLabel = UILabel()
         descriptionLabel.textColor = UIColor(named: "YP White")
@@ -140,6 +132,7 @@ final class ProfileViewController: UIViewController {
             exitButton.addTarget(self, action: #selector(Self.didTapLogoutButton), for: .touchUpInside)
         }
         exitButton.translatesAutoresizingMaskIntoConstraints = false
+        exitButton.accessibilityIdentifier = "logout button"
         
         view.addSubview(avatarImageView)
         view.addSubview(userNameLabel)
